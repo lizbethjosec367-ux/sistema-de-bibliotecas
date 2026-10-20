@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteca IESTP Santa Lucía</title>
+<style>
+:root{
+  --navy:#0a2f6b; --blue:#1565c0; --sky:#4fc3f7; --light:#e3f2fd; --pale:#f2f7fd; --line:#d6e4f5;
+  --text:#14253f; --muted:#5b6b82; --ok:#1b9e63; --warn:#e69500; --bad:#d63a3a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--pale);color:var(--text);min-height:100vh}
+button{font-family:inherit}
+/* LOGIN */
+#login{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy),var(--blue) 55%,var(--sky));display:flex;align-items:center;justify-content:center;padding:16px;z-index:200}
+.lbox{background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:400px;box-shadow:0 25px 60px rgba(0,0,0,.35);text-align:center}
+.lbox .logo{margin:0 auto 14px;width:72px;height:72px;font-size:28px}
+.lbox h1{font-size:20px;color:var(--navy)}
+.lbox p{font-size:13px;color:var(--muted);margin:4px 0 22px}
+.lbox .f{text-align:left}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:8px}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff;display:grid;place-items:center;font-weight:800;font-size:17px;flex:none}
+/* LAYOUT */
+.app{display:none;min-height:100vh}
+.app.on{display:flex}
+aside{width:250px;background:linear-gradient(180deg,var(--navy),#0d4a9e);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex:none}
+.brand{display:flex;gap:12px;align-items:center;padding:22px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.brand b{font-size:15px;display:block;line-height:1.2}
+.brand small{font-size:11.5px;opacity:.75}
+aside nav{padding:14px 10px;flex:1}
+aside nav button{display:flex;align-items:center;gap:12px;width:100%;background:transparent;border:0;color:#cfe4ff;padding:12px 14px;border-radius:10px;font-size:14.5px;font-weight:600;cursor:pointer;margin-bottom:4px;text-align:left;transition:.15s}
+aside nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+aside nav button.on{background:rgba(79,195,247,.22);color:#fff;box-shadow:inset 3px 0 0 var(--sky)}
+aside nav svg{width:19px;height:19px;flex:none}
+.user{padding:14px 18px;border-top:1px solid rgba(255,255,255,.12);font-size:13px}
+.user button{margin-top:8px;background:rgba(255,255,255,.12);border:0;color:#fff;padding:7px 12px;border-radius:8px;cursor:pointer;font-size:12.5px;width:100%}
+.user button:hover{background:rgba(255,255,255,.2)}
+.content{flex:1;min-width:0}
+.topbar{background:#fff;border-bottom:1px solid var(--line);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:21px;color:var(--navy)}
+.topbar small{color:var(--muted);font-size:13px}
+.menu{display:none;background:var(--light);border:0;border-radius:10px;padding:8px 12px;color:var(--blue);font-size:18px;cursor:pointer}
+main{padding:24px 28px 50px;max-width:1300px}
+.sec{display:none}.sec.on{display:block}
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:22px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(21,101,192,.06)}
+.stat{display:flex;gap:14px;align-items:center}
+.ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--light);color:var(--blue);flex:none}
+.ico svg{width:23px;height:23px}
+.stat.ok .ico{background:#e0f6ec;color:var(--ok)}
+.stat.bad .ico{background:#fde8e8;color:var(--bad)}
+.stat .n{font-size:28px;font-weight:800;color:var(--navy);line-height:1}
+.stat .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+.grid2{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin-bottom:20px}
+h2{font-size:16px;color:var(--navy);margin-bottom:14px}
+.bars .r{margin-bottom:14px}
+.bars .t{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.bars .b{height:10px;background:var(--light);border-radius:6px;overflow:hidden}
+.bars .b i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--blue),var(--sky))}
+/* CONTROLS */
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+input,select,textarea{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--sky);border-color:var(--sky)}
+.bar input{flex:1;min-width:200px;width:auto}
+.bar select{width:auto;min-width:170px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:600;font-size:14px;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn:hover{background:var(--navy)}
+.btn.sky{background:var(--sky);color:#05304f}.btn.sky:hover{background:#29b6f6}
+.btn.ghost{background:var(--light);color:var(--blue)}.btn.ghost:hover{background:#cfe6fb}
+.btn.red{background:#fde8e8;color:var(--bad)}.btn.red:hover{background:#f9d0d0}
+.btn.sm{padding:6px 12px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.tw{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:720px}
+th{background:var(--light);color:var(--navy);text-align:left;padding:12px 14px;font-size:12.5px;text-transform:uppercase;letter-spacing:.4px}
+td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:#f8fbff}
+td .sub{font-size:12px;color:var(--muted)}
+td.acts{white-space:nowrap;text-align:right}
+td.acts .btn{margin-left:4px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.pill.ok{background:#e0f6ec;color:var(--ok)}.pill.warn{background:#fff2d6;color:#b87400}
+.pill.bad{background:#fde8e8;color:var(--bad)}.pill.gray{background:#eaeff6;color:var(--muted)}
+.pill.blue{background:var(--light);color:var(--blue)}
+.empty{text-align:center;color:var(--muted);padding:34px 20px}
+/* MODALS */
+.modal{position:fixed;inset:0;background:rgba(10,47,107,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
+.modal.on{display:flex}
+.box{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:560px;max-height:92vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.box.wide{max-width:820px}
+.box h2{font-size:18px;margin-bottom:16px}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:12.5px;font-weight:600;color:var(--navy);margin-bottom:5px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mf{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.info{background:var(--pale);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13.5px;margin-bottom:12px;line-height:1.6}
+.warnbox{background:#fff2d6;border-color:#f3d48c;color:#7a5200}
+.badbox{background:#fde8e8;border-color:#f4b9b9;color:#8f2020}
+.okbox{background:#e0f6ec;border-color:#a6dfc4;color:#116b43}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;transition:.3s;z-index:300;opacity:0;max-width:90vw}
+.toast.on{transform:translateX(-50%);opacity:1}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 18px;font-size:13.5px;margin-bottom:14px}
+.mini span{display:block;font-size:11.5px;color:var(--muted)}
+.rep{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.rep .card h3{font-size:15px;color:var(--navy);margin-bottom:6px}
+.rep .card p{font-size:13px;color:var(--muted);margin-bottom:14px;min-height:36px}
+@media(max-width:900px){
+  aside{position:fixed;left:-260px;z-index:150;transition:.25s}
+  aside.on{left:0}
+  .menu{display:block}.grid2{grid-template-columns:1fr}
+  main{padding:18px 14px 40px}.topbar{padding:12px 14px}
+}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <form class="lbox" onsubmit="entrar(event)">
+    <div class="logo">SL</div>
+    <h1>IESTP Santa Lucía</h1>
+    <p>Sistema de Gestión de Biblioteca</p>
+    <div class="f"><label>Usuario</label><input id="lu" autocomplete="username" required></div>
+    <div class="f"><label>Contraseña</label><input id="lp" type="password" autocomplete="current-password" required></div>
+    <div class="err" id="lerr"></div>
+    <button class="btn" style="width:100%;padding:12px">Ingresar</button>
+  </form>
+</div>
+
+<div class="app" id="app">
+  <aside id="side">
+    <div class="brand"><div class="logo">SL</div><div><b>IESTP Santa Lucía</b><small>Biblioteca Institucional</small></div></div>
+    <nav id="nav">
+      <button data-s="dashboard" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Panel principal</button>
+      <button data-s="libros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Libros</button>
+      <button data-s="estudiantes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>Estudiantes</button>
+      <button data-s="prestamos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Préstamos</button>
+      <button data-s="reportes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>Reportes y respaldo</button>
+    </nav>
+    <div class="user">Sesión: <b id="uname"></b><button onclick="salir()">Cerrar sesión</button></div>
+  </aside>
+
+  <div class="content">
+    <div class="topbar">
+      <div style="display:flex;gap:12px;align-items:center">
+        <button class="menu" onclick="$('side').classList.toggle('on')">☰</button>
+        <div><h1 id="ttl">Panel principal</h1><small id="fechaHoy"></small></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost" onclick="abrirEst()">+ Nuevo estudiante</button>
+        <button class="btn" onclick="abrirPrestamo()">+ Nuevo préstamo</button>
+      </div>
+    </div>
+
+    <main>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="sec on">
+        <div class="cards" id="stats"></div>
+        <div class="grid2">
+          <div class="card"><h2>Libros por módulo</h2><div class="bars" id="barras"></div></div>
+          <div class="card"><h2>Alertas de devolución</h2><div id="alertas"></div></div>
+        </div>
+        <div class="card"><h2>Últimos préstamos</h2><div class="tw" style="border:0"><table><thead><tr><th>N°</th><th>Libro</th><th>Estudiante</th><th>Vence</th><th>Estado</th></tr></thead><tbody id="ult"></tbody></table></div></div>
+      </section>
+
+      <!-- LIBROS -->
+      <section id="libros" class="sec">
+        <div class="bar">
+          <input id="q" placeholder="Buscar por título, autor o código…">
+          <select id="fmod"></select>
+          <button class="btn" onclick="abrirLibro()">+ Subir libro</button>
+        </div>
+        <div class="tw"><table>
+          <thead><tr><th>Código</th><th>Título / Autor</th><th>Módulo</th><th>Disponibilidad</th><th></th></tr></thead>
+          <tbody id="tbl"></tbody></table></div>
+      </section>
+
+      <!-- ESTUDIANTES -->
+      <section id="estudiantes" class="sec">
+        <div class="bar">
+          <input id="qe" placeholder="Buscar por nombre, DNI o código de matrícula…">
+          <select id="femod"></select>
+          <button class="btn" onclick="abrirEst()">+ Registrar estudiante</button>
+        </div>
+        <div class="tw"><table>
+          <thead><tr><th>Estudiante</th><th>DNI</th><th>Módulo / Ciclo</th><th>Contacto</th><th>Préstamos</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="tbe"></tbody></table></div>
+      </section>
+
+      <!-- PRESTAMOS -->
+      <section id="prestamos" class="sec">
+        <div class="bar">
+          <input id="qp" placeholder="Buscar por estudiante, DNI, libro o N° de préstamo…">
+          <select id="fest">
+            <option value="activos">Activos</option><option value="vencidos">Vencidos</option>
+            <option value="devueltos">Devueltos</option><option value="todos">Todos</option>
+          </select>
+          <button class="btn" onclick="abrirPrestamo()">+ Nuevo préstamo</button>
+        </div>
+        <div class="tw"><table>
+          <thead><tr><th>N°</th><th>Libro</th><th>Estudiante</th><th>Prestado</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="tbp"></tbody></table></div>
+      </section>
+
+      <!-- REPORTES -->
+      <section id="reportes" class="sec">
+        <div class="rep">
+          <div class="card"><h3>Préstamos vencidos</h3><p>Lista imprimible de estudiantes con libros fuera de plazo y multa acumulada.</p><button class="btn" onclick="repVencidos()">Imprimir</button></div>
+          <div class="card"><h3>Inventario por módulo</h3><p>Catálogo completo de libros con ejemplares y disponibilidad.</p><button class="btn" onclick="repInventario()">Imprimir</button></div>
+          <div class="card"><h3>Padrón de estudiantes</h3><p>Relación de estudiantes registrados por módulo y ciclo.</p><button class="btn" onclick="repEstudiantes()">Imprimir</button></div>
+          <div class="card"><h3>Exportar a Excel (CSV)</h3><p>Descarga préstamos o estudiantes para abrir en Excel.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" onclick="csvPrestamos()">Préstamos</button><button class="btn ghost" onclick="csvEst()">Estudiantes</button></div></div>
+          <div class="card"><h3>Respaldo de datos</h3><p>Los datos viven en este navegador. Descarga un respaldo con frecuencia (no incluye los PDF).</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="exportar()">Descargar</button><label class="btn ghost" style="cursor:pointer">Restaurar<input type="file" accept=".json" hidden onchange="importar(event)"></label></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- MODAL LIBRO -->
+<div class="modal" id="mLibro"><form class="box" onsubmit="guardarLibro(event)">
+  <h2 id="tLibro">Subir nuevo libro</h2>
+  <input type="hidden" id="lId">
+  <div class="f"><label>Título *</label><input id="lTitulo" required></div>
+  <div class="row">
+    <div class="f"><label>Autor *</label><input id="lAutor" required></div>
+    <div class="f"><label>Editorial / Año</label><input id="lAnio" placeholder="Ej: Alfaomega 2021"></div>
+  </div>
+  <div class="row">
+    <div class="f"><label>Módulo *</label><select id="lMod" required></select></div>
+    <div class="f"><label>Ejemplares *</label><input id="lCant" type="number" min="1" value="1" required></div>
+  </div>
+  <div class="f"><label>Archivo digital (PDF, opcional)</label><input id="lFile" type="file" accept=".pdf,.epub,.doc,.docx"><div class="hint">Si lo adjuntas, se podrá abrir desde el catálogo.</div></div>
+  <div class="mf"><button type="button" class="btn ghost" onclick="cerrar('mLibro')">Cancelar</button><button class="btn">Guardar libro</button></div>
+</form></div>
+
+<!-- MODAL ESTUDIANTE -->
+<div class="modal" id="mEst"><form class="box" onsubmit="guardarEst(event)">
+  <h2 id="tEst">Registrar estudiante</h2>
+  <input type="hidden" id="eId">
+  <div class="row">
+    <div class="f"><label>DNI *</label><input id="eDni" required pattern="[0-9]{8}" maxlength="8" inputmode="numeric" title="8 dígitos"></div>
+    <div class="f"><label>Código de matrícula</label><input id="eCod"></div>
+  </div>
+  <div class="row">
+    <div class="f"><label>Nombres *</label><input id="eNom" required></div>
+    <div class="f"><label>Apellidos *</label><input id="eApe" required></div>
+  </div>
+  <div class="row">
+    <div class="f"><label>Módulo / Programa *</label><select id="eMod" required></select></div>
+    <div class="f"><label>Ciclo / Semestre *</label><select id="eCiclo"><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option><option>VI</option></select></div>
+  </div>
+  <div class="row">
+    <div class="f"><label>Celular</label><input id="eTel" inputmode="tel" maxlength="12"></div>
+    <div class="f"><label>Correo electrónico</label><input id="eMail" type="email"></div>
+  </div>
+  <div class="f"><label>Estado</label><select id="eEstado"><option>Activo</option><option>Inactivo</option></select><div class="hint">Un estudiante inactivo no puede solicitar préstamos.</div></div>
+  <div class="mf"><button type="button" class="btn ghost" onclick="cerrar('mEst')">Cancelar</button><button class="btn">Guardar estudiante</button></div>
+</form></div>
+
+<!-- MODAL FICHA -->
+<div class="modal" id="mFicha"><div class="box wide" id="fichaBox"></div></div>
+
+<!-- MODAL PRESTAMO -->
+<div class="modal" id="mPrest"><form class="box" onsubmit="guardarPrestamo(event)">
+  <h2>Registrar préstamo</h2>
+  <div class="f"><label>Estudiante (escribe DNI o apellido) *</label>
+    <input id="pEst" list="dlEst" autocomplete="off" required oninput="chkEst()">
+    <datalist id="dlEst"></datalist>
+  </div>
+  <div id="pInfo"></div>
+  <div class="f"><label>Libro disponible *</label><select id="pLib" required></select></div>
+  <div class="row">
+    <div class="f"><label>Plazo (días) *</label><input id="pDias" type="number" min="1" required oninput="calcVence()"></div>
+    <div class="f"><label>Fecha de devolución</label><input id="pVence" readonly></div>
+  </div>
+  <div class="f"><label>Observaciones</label><input id="pObs" placeholder="Estado del libro, etc. (opcional)"></div>
+  <div class="mf"><button type="button" class="btn ghost" onclick="cerrar('mPrest')">Cancelar</button><button class="btn" id="pBtn">Prestar libro</button></div>
+</form></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ CONFIGURACIÓN (edita aquí) ============ */
+const MODULOS = [
+  "Producción Agropecuaria",
+  "Computación e Informática",
+  "Otro programa de estudios"      // <- cambia por tu tercer módulo
+];
+const USUARIO = "bibliotecario";
+const CLAVE = "santalucia2026";      // <- cámbiala
+const DIAS_PRESTAMO = 7;             // plazo por defecto
+const DIAS_MAX = 30;
+const MAX_LIBROS = 3;                // libros simultáneos por estudiante
+const MULTA_DIA = 0.50;              // S/ por día de retraso y por libro
+const INSTITUCION = "IESTP Santa Lucía";
+
+/* ============ DATOS ============ */
+const KEY = "bib_santalucia_v2";
+let db = { libros:[], estudiantes:[], prestamos:[], seq:0 };
+try { db = Object.assign(db, JSON.parse(localStorage.getItem(KEY)) || {}); } catch(e){}
+const guardar = () => localStorage.setItem(KEY, JSON.stringify(db));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open("bib_archivos",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("f"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });}
+async function putFile(id,b){ const d=await idb(); return new Promise((res,rej)=>{ const t=d.transaction("f","readwrite"); t.objectStore("f").put(b,id); t.oncomplete=res; t.onerror=()=>rej(t.error); });}
+async function getFile(id){ const d=await idb(); return new Promise((res,rej)=>{ const q=d.transaction("f").objectStore("f").get(id); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); });}
+async function delFile(id){ const d=await idb(); d.transaction("f","readwrite").objectStore("f").delete(id); }
+
+/* ============ UTILIDADES ============ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const hoy = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const fmt = s => { if(!s) return "—"; const [y,m,d]=s.split("-"); return `${d}/${m}/${y}`; };
+const sumar = (s,n) => { const d=new Date(s+"T00:00:00"); d.setDate(d.getDate()+n); return ymd(d); };
+const diasHasta = s => Math.round((new Date(s+"T00:00:00")-hoy())/86400000);
+const soles = n => "S/ " + n.toFixed(2);
+const nro = n => String(n).padStart(6,"0");
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),3000); }
+function cerrar(id){ $(id).classList.remove("on"); }
+const libro = id => db.libros.find(l=>l.id===id);
+const est = id => db.estudiantes.find(e=>e.id===id);
+const nombreEst = e => e ? `${e.apellidos}, ${e.nombres}` : "(eliminado)";
+const prestados = id => db.prestamos.filter(p=>p.libroId===id && !p.devuelto).length;
+const activosDe = id => db.prestamos.filter(p=>p.estId===id && !p.devuelto);
+const vencidosDe = id => activosDe(id).filter(p=>diasHasta(p.vence)<0);
+const multaP = p => { const f = p.devuelto ? Math.max(0,Math.round((new Date(p.devuelto)-new Date(p.vence))/86400000)) : Math.max(0,-diasHasta(p.vence)); return f*MULTA_DIA; };
+
+function estadoPill(p){
+  if(p.devuelto) return `<span class="pill gray">Devuelto ${fmt(p.devuelto)}</span>`;
+  const d=diasHasta(p.vence);
+  if(d<0) return `<span class="pill bad">Vencido · ${-d} d</span>`;
+  if(d<=2) return `<span class="pill warn">${d===0?"Vence hoy":"Vence en "+d+" d"}</span>`;
+  return `<span class="pill ok">En plazo · ${d} d</span>`;
+}
+
+/* ============ SESIÓN ============ */
+function entrar(e){
+  e.preventDefault();
+  if($("lu").value.trim()===USUARIO && $("lp").value===CLAVE){
+    sessionStorage.setItem("bib_ok","1"); iniciar();
+  } else $("lerr").textContent = "Usuario o contraseña incorrectos";
+}
+function salir(){ sessionStorage.removeItem("bib_ok"); location.reload(); }
+function iniciar(){
+  $("login").style.display="none"; $("app").classList.add("on"); $("uname").textContent=USUARIO;
+  $("fechaHoy").textContent = new Date().toLocaleDateString("es-PE",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  fillMods(); render();
+}
+
+/* ============ NAVEGACIÓN ============ */
+const TITULOS = {dashboard:"Panel principal",libros:"Catálogo de libros",estudiantes:"Registro de estudiantes",prestamos:"Control de préstamos",reportes:"Reportes y respaldo"};
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>ir(b.dataset.s));
+function ir(s){
+  document.querySelectorAll(".sec").forEach(e=>e.classList.toggle("on",e.id===s));
+  document.querySelectorAll("#nav button").forEach(e=>e.classList.toggle("on",e.dataset.s===s));
+  $("ttl").textContent = TITULOS[s]; $("side").classList.remove("on"); render();
+}
+function fillMods(){
+  const o = MODULOS.map(m=>`<option>${esc(m)}</option>`).join("");
+  $("fmod").innerHTML = `<option value="">Todos los módulos</option>`+o;
+  $("femod").innerHTML = `<option value="">Todos los módulos</option>`+o;
+  $("lMod").innerHTML = o; $("eMod").innerHTML = o;
+}
+
+/* ============ RENDER ============ */
+function render(){ rDash(); rLibros(); rEst(); rPrest(); }
+const IC = {
+  libro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg>',
+  loan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>'
+};
+function rDash(){
+  const total = db.libros.reduce((a,l)=>a+l.cant,0);
+  const act = db.prestamos.filter(p=>!p.devuelto);
+  const venc = act.filter(p=>diasHasta(p.vence)<0);
+  $("stats").innerHTML = `
+   <div class="card stat"><div class="ico">${IC.libro}</div><div><div class="n">${db.libros.length}</div><div class="l">Títulos · ${total} ejemplares</div></div></div>
+   <div class="card stat"><div class="ico">${IC.user}</div><div><div class="n">${db.estudiantes.length}</div><div class="l">Estudiantes registrados</div></div></div>
+   <div class="card stat ok"><div class="ico">${IC.loan}</div><div><div class="n">${act.length}</div><div class="l">Préstamos activos</div></div></div>
+   <div class="card stat bad"><div class="ico">${IC.warn}</div><div><div class="n">${venc.length}</div><div class="l">Préstamos vencidos</div></div></div>`;
+  const mx = Math.max(1,...MODULOS.map(m=>db.libros.filter(l=>l.modulo===m).length));
+  $("barras").innerHTML = MODULOS.map(m=>{ const n=db.libros.filter(l=>l.modulo===m).length;
+    return `<div class="r"><div class="t"><span>${esc(m)}</span><b>${n} títulos</b></div><div class="b"><i style="width:${n/mx*100}%"></i></div></div>`; }).join("");
+  const al = act.filter(p=>diasHasta(p.vence)<=2).sort((a,b)=>a.vence.localeCompare(b.vence)).slice(0,6);
+  $("alertas").innerHTML = al.length ? al.map(p=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px"><div><b>${esc(libro(p.libroId)?.titulo)}</b><div class="sub" style="color:var(--muted);font-size:12px">${esc(nombreEst(est(p.estId)))}</div></div>${estadoPill(p)}</div>`).join("")
+    : `<div class="empty">Sin alertas. Todo al día ✔</div>`;
+  const u = [...db.prestamos].sort((a,b)=>b.n-a.n).slice(0,6);
+  $("ult").innerHTML = u.length ? u.map(p=>`<tr><td>${nro(p.n)}</td><td>${esc(libro(p.libroId)?.titulo||"—")}</td><td>${esc(nombreEst(est(p.estId)))}</td><td>${fmt(p.vence)}</td><td>${estadoPill(p)}</td></tr>`).join("")
+    : `<tr><td colspan="5" class="empty">Aún no hay préstamos registrados.</td></tr>`;
+}
+
+function rLibros(){
+  const q=$("q").value.toLowerCase(), m=$("fmod").value;
+  const r = db.libros.filter(l=>(!m||l.modulo===m)&&`${l.titulo} ${l.autor} ${l.codigo}`.toLowerCase().includes(q));
+  $("tbl").innerHTML = r.length ? r.map(l=>{ const d=l.cant-prestados(l.id);
+    return `<tr><td><b>${esc(l.codigo)}</b></td>
+     <td><b>${esc(l.titulo)}</b><div class="sub">${esc(l.autor)}${l.anio?" · "+esc(l.anio):""}</div></td>
+     <td><span class="pill blue">${esc(l.modulo)}</span></td>
+     <td>${d>0?`<span class="pill ok">${d} de ${l.cant} disponibles</span>`:`<span class="pill bad">Sin ejemplares</span>`}</td>
+     <td class="acts">${l.archivo?`<button class="btn sm sky" onclick="verArchivo('${l.id}')">Ver PDF</button>`:""}
+       <button class="btn sm ghost" onclick="abrirLibro('${l.id}')">Editar</button>
+       <button class="btn sm red" onclick="borrarLibro('${l.id}')">Eliminar</button></td></tr>`; }).join("")
+   : `<tr><td colspan="5" class="empty">No hay libros. Usa “+ Subir libro” para registrar el primero.</td></tr>`;
+}
+
+function rEst(){
+  const q=$("qe").value.toLowerCase(), m=$("femod").value;
+  const r = db.estudiantes.filter(e=>(!m||e.modulo===m)&&`${e.nombres} ${e.apellidos} ${e.dni} ${e.codigo}`.toLowerCase().includes(q))
+    .sort((a,b)=>a.apellidos.localeCompare(b.apellidos));
+  $("tbe").innerHTML = r.length ? r.map(e=>{ const a=activosDe(e.id).length, v=vencidosDe(e.id).length;
+    return `<tr><td><b>${esc(nombreEst(e))}</b><div class="sub">Mat. ${esc(e.codigo||"—")}</div></td><td>${esc(e.dni)}</td>
+     <td>${esc(e.modulo)}<div class="sub">Ciclo ${esc(e.ciclo)}</div></td>
+     <td>${esc(e.tel||"—")}<div class="sub">${esc(e.mail||"")}</div></td>
+     <td>${a} activo(s)${v?` <span class="pill bad">${v} vencido(s)</span>`:""}</td>
+     <td><span class="pill ${e.estado==="Activo"?"ok":"gray"}">${esc(e.estado)}</span></td>
+     <td class="acts"><button class="btn sm" onclick="ficha('${e.id}')">Ficha</button>
+       <button class="btn sm ghost" onclick="abrirEst('${e.id}')">Editar</button></td></tr>`; }).join("")
+   : `<tr><td colspan="7" class="empty">No hay estudiantes registrados. Usa “+ Registrar estudiante”.</td></tr>`;
+}
+
+function rPrest(){
+  const q=$("qp").value.toLowerCase(), f=$("fest").value;
+  const r = db.prestamos.filter(p=>{ const e=est(p.estId), l=libro(p.libroId);
+    if(!`${nombreEst(e)} ${e?.dni} ${l?.titulo} ${nro(p.n)}`.toLowerCase().includes(q)) return false;
+    if(f==="activos") return !p.devuelto; if(f==="vencidos") return !p.devuelto&&diasHasta(p.vence)<0;
+    if(f==="devueltos") return !!p.devuelto; return true; }).sort((a,b)=>b.n-a.n);
+  $("tbp").innerHTML = r.length ? r.map(p=>{ const e=est(p.estId), l=libro(p.libroId), m=multaP(p);
+    return `<tr><td>${nro(p.n)}</td><td><b>${esc(l?.titulo||"(eliminado)")}</b><div class="sub">${esc(l?.codigo||"")}</div></td>
+     <td>${esc(nombreEst(e))}<div class="sub">DNI ${esc(e?.dni||"")}</div></td><td>${fmt(p.fecha)}</td><td>${fmt(p.vence)}${p.renovado?'<div class="sub">Renovado</div>':""}</td>
+     <td>${estadoPill(p)}${m>0?`<div class="sub" style="color:var(--bad)">Multa ${soles(m)}</div>`:""}</td>
+     <td class="acts">${p.devuelto?"":`<button class="btn sm" onclick="devolver('${p.id}')">Devolver</button>
+       ${!p.renovado&&diasHasta(p.vence)>=0?`<button class="btn sm ghost" onclick="renovar('${p.id}')">Renovar</button>`:""}`}
+       <button class="btn sm ghost" onclick="ticket('${p.id}')">Comprobante</button></td></tr>`; }).join("")
+   : `<tr><td colspan="7" class="empty">Sin préstamos en esta vista.</td></tr>`;
+}
+["q","qe","qp"].forEach(i=>$(i).oninput=render);
+["fmod","femod","fest"].forEach(i=>$(i).onchange=render);
+
+/* ============ LIBROS ============ */
+function abrirLibro(id){
+  const f=$("mLibro").querySelector("form"); f.reset(); $("lId").value=id||"";
+  $("tLibro").textContent = id?"Editar libro":"Subir nuevo libro";
+  if(id){ const l=libro(id); $("lTitulo").value=l.titulo; $("lAutor").value=l.autor; $("lAnio").value=l.anio||""; $("lMod").value=l.modulo; $("lCant").value=l.cant; }
+  $("mLibro").classList.add("on");
+}
+async function guardarLibro(e){
+  e.preventDefault(); const id=$("lId").value, file=$("lFile").files[0];
+  let l = id ? libro(id) : null;
+  const cant = Math.max(1,parseInt($("lCant").value)||1);
+  if(l && cant < prestados(l.id)) return toast("Los ejemplares no pueden ser menos que los prestados ("+prestados(l.id)+")");
+  if(!l){ l={id:uid(),archivo:false}; db.libros.push(l); }
+  const cambioMod = l.modulo!==$("lMod").value;
+  Object.assign(l,{titulo:$("lTitulo").value.trim(),autor:$("lAutor").value.trim(),anio:$("lAnio").value.trim(),modulo:$("lMod").value,cant});
+  if(!l.codigo || cambioMod){ const i=MODULOS.indexOf(l.modulo)+1; const n=db.libros.filter(x=>x.modulo===l.modulo&&x!==l).length+1; l.codigo=`M${i}-${String(n).padStart(3,"0")}`; }
+  if(file){ try{ await putFile(l.id,file); l.archivo=true; }catch{ toast("No se pudo guardar el archivo"); } }
+  guardar(); cerrar("mLibro"); render(); toast("Libro guardado: "+l.codigo);
+}
+async function verArchivo(id){ const b=await getFile(id); if(!b) return toast("Archivo no disponible en este equipo"); window.open(URL.createObjectURL(b),"_blank"); }
+function borrarLibro(id){
+  if(db.prestamos.some(p=>p.libroId===id&&!p.devuelto)) return toast("No se puede eliminar: tiene préstamos activos");
+  if(!confirm("¿Eliminar este libro del catálogo?")) return;
+  delFile(id); db.libros=db.libros.filter(l=>l.id!==id); guardar(); render(); toast("Libro eliminado");
+}
+
+/* ============ ESTUDIANTES ============ */
+function abrirEst(id){
+  $("mEst").querySelector("form").reset(); $("eId").value=id||"";
+  $("tEst").textContent = id?"Editar estudiante":"Registrar estudiante";
+  if(id){ const e=est(id); $("eDni").value=e.dni; $("eCod").value=e.codigo||""; $("eNom").value=e.nombres; $("eApe").value=e.apellidos;
+    $("eMod").value=e.modulo; $("eCiclo").value=e.ciclo; $("eTel").value=e.tel||""; $("eMail").value=e.mail||""; $("eEstado").value=e.estado; }
+  $("mEst").classList.add("on");
+}
+function guardarEst(e){
+  e.preventDefault(); const id=$("eId").value, dni=$("eDni").value.trim();
+  if(db.estudiantes.some(x=>x.dni===dni&&x.id!==id)) return toast("Ya existe un estudiante con ese DNI");
+  let s = id ? est(id) : null; if(!s){ s={id:uid()}; db.estudiantes.push(s); }
+  Object.assign(s,{dni,codigo:$("eCod").value.trim(),nombres:$("eNom").value.trim(),apellidos:$("eApe").value.trim(),modulo:$("eMod").value,
+    ciclo:$("eCiclo").value,tel:$("eTel").value.trim(),mail:$("eMail").value.trim(),estado:$("eEstado").value});
+  guardar(); cerrar("mEst"); render(); toast("Estudiante guardado");
+}
+function ficha(id){
+  const e=est(id), hist=db.prestamos.filter(p=>p.estId===id).sort((a,b)=>b.n-a.n);
+  const deuda = hist.reduce((a,p)=>a+multaP(p),0);
+  $("fichaBox").innerHTML = `
+   <h2>Ficha del estudiante</h2>
+   <div class="info"><b style="font-size:16px;color:var(--navy)">${esc(nombreEst(e))}</b>
+     <div class="mini" style="margin:10px 0 0">
+      <div><span>DNI</span>${esc(e.dni)}</div><div><span>Matrícula</span>${esc(e.codigo||"—")}</div>
+      <div><span>Módulo</span>${esc(e.modulo)}</div><div><span>Ciclo</span>${esc(e.ciclo)}</div>
+      <div><span>Celular</span>${esc(e.tel||"—")}</div><div><span>Correo</span>${esc(e.mail||"—")}</div></div></div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+     <span class="pill blue">${hist.length} préstamo(s) en total</span><span class="pill ok">${activosDe(id).length} activo(s)</span>
+     ${deuda>0?`<span class="pill bad">Multas acumuladas ${soles(deuda)}</span>`:""}</div>
+   <div class="tw"><table style="min-width:560px"><thead><tr><th>N°</th><th>Libro</th><th>Prestado</th><th>Vence</th><th>Estado</th></tr></thead><tbody>
+   ${hist.length?hist.map(p=>`<tr><td>${nro(p.n)}</td><td>${esc(libro(p.libroId)?.titulo||"—")}</td><td>${fmt(p.fecha)}</td><td>${fmt(p.vence)}</td><td>${estadoPill(p)}</td></tr>`).join(""):`<tr><td colspan="5" class="empty">Sin préstamos.</td></tr>`}
+   </tbody></table></div>
+   <div class="mf"><button class="btn ghost" onclick="cerrar('mFicha')">Cerrar</button>
+     <button class="btn sky" onclick="carnet('${id}')">Imprimir carnet</button>
+     <button class="btn" onclick="cerrar('mFicha');abrirPrestamo('${id}')">Nuevo préstamo</button></div>`;
+  $("mFicha").classList.add("on");
+}
+
+/* ============ PRÉSTAMOS ============ */
+let estSel = null;
+function abrirPrestamo(estId){
+  $("mPrest").querySelector("form").reset(); estSel=null;
+  $("dlEst").innerHTML = db.estudiantes.filter(e=>e.estado==="Activo").map(e=>`<option value="${esc(e.dni)} — ${esc(nombreEst(e))}">`).join("");
+  const disp = db.libros.filter(l=>l.cant-prestados(l.id)>0);
+  $("pLib").innerHTML = disp.length ? disp.map(l=>`<option value="${l.id}">${esc(l.codigo)} · ${esc(l.titulo)} (${l.cant-prestados(l.id)} disp.)</option>`).join("") : `<option value="">No hay libros disponibles</option>`;
+  $("pDias").value=DIAS_PRESTAMO; $("pDias").max=DIAS_MAX; calcVence();
+  if(estId){ const e=est(estId); $("pEst").value=`${e.dni} — ${nombreEst(e)}`; }
+  chkEst(); $("mPrest").classList.add("on");
+}
+function calcVence(){ const n=Math.min(DIAS_MAX,Math.max(1,parseInt($("pDias").value)||1)); $("pVence").value=fmt(sumar(ymd(hoy()),n)); }
+function chkEst(){
+  const dni=($("pEst").value.match(/^\d{8}/)||[""])[0]; estSel = db.estudiantes.find(e=>e.dni===dni)||null;
+  const box=$("pInfo"); $("pBtn").disabled=false;
+  if(!estSel){ box.innerHTML = $("pEst").value ? `<div class="info warnbox">Selecciona un estudiante de la lista. Si no existe, regístralo primero.</div>` : ""; $("pBtn").disabled=!!$("pEst").value&&true; return; }
+  const a=activosDe(estSel.id).length, v=vencidosDe(estSel.id).length; let cls="okbox", msg="";
+  if(estSel.estado!=="Activo"){ cls="badbox"; msg="Estudiante inactivo: no puede solicitar préstamos."; $("pBtn").disabled=true; }
+  else if(v){ cls="badbox"; msg=`Tiene ${v} libro(s) vencido(s). Debe devolverlos antes de un nuevo préstamo.`; $("pBtn").disabled=true; }
+  else if(a>=MAX_LIBROS){ cls="warnbox"; msg=`Alcanzó el máximo de ${MAX_LIBROS} libros prestados.`; $("pBtn").disabled=true; }
+  else msg=`Apto para préstamo · ${a} de ${MAX_LIBROS} libros en uso.`;
+  box.innerHTML = `<div class="info ${cls}"><b>${esc(nombreEst(estSel))}</b><br>${esc(estSel.modulo)} · Ciclo ${esc(estSel.ciclo)}<br>${msg}</div>`;
+}
+function guardarPrestamo(e){
+  e.preventDefault(); chkEst(); if(!estSel||$("pBtn").disabled) return;
+  const l=libro($("pLib").value); if(!l||l.cant-prestados(l.id)<1) return toast("Libro no disponible");
+  if(db.prestamos.some(p=>!p.devuelto&&p.estId===estSel.id&&p.libroId===l.id)) return toast("El estudiante ya tiene este libro");
+  const n=Math.min(DIAS_MAX,Math.max(1,parseInt($("pDias").value)||1)), f=ymd(hoy());
+  const p={id:uid(),n:++db.seq,libroId:l.id,estId:estSel.id,fecha:f,vence:sumar(f,n),devuelto:null,renovado:false,obs:$("pObs").value.trim()};
+  db.prestamos.push(p); guardar(); cerrar("mPrest"); render(); toast("Préstamo N° "+nro(p.n)+" registrado"); ticket(p.id);
+}
+function devolver(id){
+  const p=db.prestamos.find(x=>x.id===id); if(!p) return;
+  const dias=Math.max(0,-diasHasta(p.vence)), m=dias*MULTA_DIA;
+  if(!confirm(m>0?`Devolución con ${dias} día(s) de retraso.\nMulta a cobrar: ${soles(m)}\n\n¿Registrar devolución?`:"¿Registrar la devolución de este libro?")) return;
+  p.devuelto=ymd(hoy()); guardar(); render(); toast(m>0?"Devuelto. Cobrar multa "+soles(m):"Devolución registrada");
+}
+function renovar(id){
+  const p=db.prestamos.find(x=>x.id===id); if(!p||p.renovado) return;
+  if(!confirm(`Renovar por ${DIAS_PRESTAMO} días más? (solo se permite una renovación)`)) return;
+  p.vence=sumar(p.vence,DIAS_PRESTAMO); p.renovado=true; guardar(); render(); toast("Nuevo vencimiento: "+fmt(p.vence));
+}
+
+/* ============ IMPRESIÓN ============ */
+const CSS_PRINT = `body{font-family:Segoe UI,Arial,sans-serif;color:#14253f;margin:30px}
+.h{display:flex;gap:14px;align-items:center;border-bottom:3px solid #1565c0;padding-bottom:12px;margin-bottom:18px}
+.lg{width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,#1565c0,#4fc3f7);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px}
+h1{font-size:18px;color:#0a2f6b}h2{font-size:15px;margin:0;color:#0a2f6b}small{color:#5b6b82}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}th{background:#e3f2fd;color:#0a2f6b;text-align:left;padding:8px;border:1px solid #c5dbf3}td{padding:8px;border:1px solid #d6e4f5}
+.f{margin-top:40px;display:flex;justify-content:space-around;font-size:12px}.f div{border-top:1px solid #333;padding-top:6px;width:200px;text-align:center}
+@media print{button{display:none}}`;
+function imprimir(html, w=900){
+  const v=window.open("","_blank",`width=${w},height=700`); if(!v) return toast("Permite las ventanas emergentes para imprimir");
+  v.document.write(`<html><head><title>${INSTITUCION}</title><style>${CSS_PRINT}</style></head><body>${html}<script>setTimeout(()=>print(),400)<\/script></body></html>`); v.document.close();
+}
+const cabecera = (t,s="") => `<div class="h"><div class="lg">SL</div><div><h1>${INSTITUCION}</h1><h2>${t}</h2><small>${s}Emitido: ${new Date().toLocaleString("es-PE")}</small></div></div>`;
+function tabla(cols,rows){ return `<table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join(""):`<tr><td colspan="${cols.length}">Sin registros</td></tr>`}</tbody></table>`; }
+
+function ticket(id){
+  const p=db.prestamos.find(x=>x.id===id), e=est(p.estId), l=libro(p.libroId);
+  imprimir(cabecera("Comprobante de préstamo N° "+nro(p.n)) + `
+   <table><tr><th style="width:30%">Estudiante</th><td>${esc(nombreEst(e))}</td></tr>
+   <tr><th>DNI / Matrícula</th><td>${esc(e.dni)} / ${esc(e.codigo||"—")}</td></tr>
+   <tr><th>Módulo / Ciclo</th><td>${esc(e.modulo)} · ${esc(e.ciclo)}</td></tr>
+   <tr><th>Libro</th><td>${esc(l.titulo)} — ${esc(l.autor)}</td></tr><tr><th>Código</th><td>${esc(l.codigo)}</td></tr>
+   <tr><th>Fecha de préstamo</th><td>${fmt(p.fecha)}</td></tr><tr><th>Fecha de devolución</th><td><b>${fmt(p.vence)}</b></td></tr>
+   ${p.obs?`<tr><th>Observaciones</th><td>${esc(p.obs)}</td></tr>`:""}</table>
+   <p style="font-size:12px;margin-top:14px">El estudiante se compromete a devolver el material en la fecha indicada. Por cada día de retraso se aplicará una multa de ${soles(MULTA_DIA)}.</p>
+   <div class="f"><div>Bibliotecario</div><div>Estudiante</div></div>`, 760);
+}
+function carnet(id){
+  const e=est(id);
+  imprimir(`<div style="width:370px;border-radius:16px;overflow:hidden;border:1px solid #1565c0;margin:20px auto;box-shadow:0 4px 14px rgba(0,0,0,.2)">
+   <div style="background:linear-gradient(120deg,#0a2f6b,#1565c0,#4fc3f7);color:#fff;padding:14px;display:flex;gap:10px;align-items:center">
+     <div class="lg" style="background:#fff;color:#1565c0;width:44px;height:44px;font-size:17px">SL</div><div><b>${INSTITUCION}</b><br><small style="color:#e3f2fd">Carnet de Biblioteca</small></div></div>
+   <div style="padding:18px;font-size:14px;line-height:1.7"><b style="font-size:17px;color:#0a2f6b">${esc(nombreEst(e))}</b><br>
+     DNI: ${esc(e.dni)}<br>Matrícula: ${esc(e.codigo||"—")}<br>${esc(e.modulo)} · Ciclo ${esc(e.ciclo)}<br><small>Válido: año ${new Date().getFullYear()}</small></div>
+   <div style="background:#e3f2fd;color:#0a2f6b;text-align:center;font-size:11px;padding:6px">Presente este carnet para solicitar préstamos</div></div>`, 520);
+}
+function repVencidos(){
+  const r=db.prestamos.filter(p=>!p.devuelto&&diasHasta(p.vence)<0).map(p=>[nro(p.n),nombreEst(est(p.estId)),est(p.estId)?.dni,libro(p.libroId)?.titulo,fmt(p.vence),-diasHasta(p.vence),soles(multaP(p))]);
+  imprimir(cabecera("Reporte de préstamos vencidos")+tabla(["N°","Estudiante","DNI","Libro","Venció","Días","Multa"],r));
+}
+function repInventario(){
+  imprimir(cabecera("Inventario de libros por módulo")+MODULOS.map(m=>`<h2 style="margin-top:18px">${esc(m)}</h2>`+tabla(["Código","Título","Autor","Ejemp.","Disp."],db.libros.filter(l=>l.modulo===m).map(l=>[l.codigo,l.titulo,l.autor,l.cant,l.cant-prestados(l.id)]))).join(""));
+}
+function repEstudiantes(){
+  imprimir(cabecera("Padrón de estudiantes")+MODULOS.map(m=>`<h2 style="margin-top:18px">${esc(m)}</h2>`+tabla(["Estudiante","DNI","Matrícula","Ciclo","Celular","Estado"],db.estudiantes.filter(x=>x.modulo===m).map(x=>[nombreEst(x),x.dni,x.codigo,x.ciclo,x.tel,x.estado]))).join(""));
+}
+
+/* ============ EXPORTAR / RESPALDO ============ */
+function descargar(nombre,txt,tipo){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([txt],{type:tipo})); a.download=nombre; a.click(); }
+const csv = rows => "\ufeff"+rows.map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+function csvPrestamos(){ descargar("prestamos.csv",csv([["N°","Estudiante","DNI","Módulo","Libro","Prestado","Vence","Devuelto","Multa"],...db.prestamos.map(p=>{const e=est(p.estId);return [nro(p.n),nombreEst(e),e?.dni,e?.modulo,libro(p.libroId)?.titulo,fmt(p.fecha),fmt(p.vence),fmt(p.devuelto),multaP(p).toFixed(2)];})]),"text/csv"); }
+function csvEst(){ descargar("estudiantes.csv",csv([["DNI","Matrícula","Apellidos","Nombres","Módulo","Ciclo","Celular","Correo","Estado"],...db.estudiantes.map(e=>[e.dni,e.codigo,e.apellidos,e.nombres,e.modulo,e.ciclo,e.tel,e.mail,e.estado])]),"text/csv"); }
+function exportar(){ descargar(`respaldo-biblioteca-${ymd(new Date())}.json`,JSON.stringify(db,null,2),"application/json"); }
+function importar(ev){
+  const f=ev.target.files[0]; if(!f) return; const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!Array.isArray(d.libros)||!Array.isArray(d.prestamos)||!Array.isArray(d.estudiantes)) throw 0;
+    if(!confirm("Esto reemplazará los datos actuales. ¿Continuar?")) return; db=Object.assign({seq:0},d); guardar(); render(); toast("Respaldo restaurado"); }catch{ toast("Archivo de respaldo no válido"); } };
+  r.readAsText(f);
+}
+
+/* ============ INICIO ============ */
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("on"); }));
+if(sessionStorage.getItem("bib_ok")) iniciar();
+</script>
+</body>
+</html>
